@@ -164,7 +164,7 @@ class BCBRevueWidget extends WP_Widget {
             $content = get_post_meta($p->ID, BCBRevuePlugin::REVUE_FIELD, true);
             $contentSrc = wp_get_attachment_image_src($content, 'thumbnail');
             ?>
-            <h3 class="bcb-title"><?php _e('BCB Revue', BCBR_TEXT_DOMAIN) ?> <?php echo esc_html($p->post_title) ?> <?php echo esc_html(get_the_date('F Y', $p)) ?></h3>
+            <h3 class="bcb-title"><?php _e('BCB Revue', BCBR_TEXT_DOMAIN) ?> <?php echo esc_html($p->post_title) ?> - <?php echo esc_html(get_the_date('F Y', $p)) ?></h3>
             <a href="<?php echo esc_url(get_permalink($p)) ?>"><img src="<?php echo esc_url($contentSrc[0]) ?>"></a>
             <?php
         }
