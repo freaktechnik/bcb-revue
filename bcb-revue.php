@@ -59,7 +59,7 @@ class BCBRevuePlugin {
                 'title'
             ],
             'rewrite' => [
-                'slug' => 'bcb-revue'
+                'slug' => 'revue'
             ]
         ]);
     }
