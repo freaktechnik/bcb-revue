@@ -38,6 +38,7 @@ class BCBRevuePlugin {
 
     private function registerHooks() {
         add_action('init', [$this, 'onInit']);
+        add_action('widgets_init', array($this, 'onWidgets'));
         if(is_admin()) {
             add_action('load-post.php', [$this, 'onLoad']);
             add_action('load-post-new.php', [$this, 'onLoad']);
@@ -121,6 +122,77 @@ class BCBRevuePlugin {
         wp_enqueue_media();
         wp_register_script('bcbr-upload', plugin_dir_url(__FILE__).'admin/js/revue.js', [], "1.0.0", true);
     }
+
+    /**
+     * Adds the widget for the current edition.
+     */
+    public function onWidgets() {
+        register_widget('BCBRevueWidget');
+    }
+}
+
+
+/**
+ * Widget to display the current BCB Revue.
+ */
+class BCBRevueWidget extends WP_Widget {
+    function __construct() {
+        parent::__construct(
+            'bcb_revue_widget',
+            __('Aktuelle BCB Revue', BCBR_TEXT_DOMAIN),
+            __('Aktuelle ausgabe der BCB Revue', BCBR_TEXT_DOMAIN)
+        );
+    }
+
+    /**
+     * Prints the widget.
+     */
+    public function widget($args, $instance) {
+        echo $args['before_widget'];
+	    if (!empty($instance['title'])) {
+		    echo $args['before_title'].apply_filters('widget_title', $instance['title']).$args['after_title'];
+	    }
+
+        $q = new WP_Query([
+            'post_type' => BCBRevuePlugin::POST_TYPE,
+            'posts_per_page' => 1,
+            'orderby' => 'date'
+        ]);
+        if($q->have_posts()) {
+            $p = $q->get_posts()[0];
+
+            $content = get_post_meta($p->ID, BCBRevuePlugin::REVUE_FIELD, true);
+            $contentSrc = wp_get_attachment_image_src($content, 'thumbnail');
+            ?>
+            <h3 class="bcb-title"><?php _e('BCB Revue', BCBR_TEXT_DOMAIN) ?> <?php echo esc_html($p->post_title) ?> <?php echo esc_html(get_the_date('F Y', $p)) ?></h3>
+            <a href="<?php echo esc_url(get_permalink($p)) ?>"><img src="<?php echo esc_url($contentSrc[0]) ?>"></a>
+            <?php
+        }
+
+        echo $args['after_widget'];
+    }
+
+    /**
+     * Prints the widget settings in the customizer.
+     */
+    public function form($instance) {
+		$title = !empty($instance['title']) ? $instance['title'] : __("Aktuelle BCB Revue", BCBR_TEXT_DOMAIN);
+		$titleFieldId = esc_attr($this->get_field_id('title'));
+?><p>
+    <label for="<?php echo $titleFieldId; ?>"><?php _e(esc_attr('Title:')); ?></label>
+    <input class="widefat" id="<?php echo $titleFieldId; ?>" name="<?php echo esc_attr($this->get_field_name('title')); ?>" type="text" value="<?php echo esc_attr($title); ?>">
+</p><?php
+	}
+
+    /**
+     * Saves the new settings from the customizer.
+     */
+	public function update($new_instance, $old_instance) {
+		$instance = [];
+		$instance['title'] = (!empty($new_instance['title'])) ? strip_tags($new_instance['title']) : '';
+
+		return $instance;
+	}
 }
 
 new BCBRevuePlugin();
