@@ -116,6 +116,7 @@ class BCBRevuePlugin {
         if(get_post_type($post_id) == self::POST_TYPE) {
             $content = sanitize_text_field($_POST['bcbr_revue_id']);
             update_post_meta($post_id, self::REVUE_FIELD, $content);
+            set_post_thumbnail($post_id, $content);
         }
     }
 
