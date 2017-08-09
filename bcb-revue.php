@@ -60,7 +60,8 @@ class BCBRevuePlugin {
             ],
             'rewrite' => [
                 'slug' => 'revue'
-            ]
+            ],
+            'query_var' => 'bcb_revue'
         ]);
     }
 
